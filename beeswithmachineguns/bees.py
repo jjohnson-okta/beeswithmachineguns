@@ -105,7 +105,7 @@ def _delete_server_list(zone):
 
 
 def _get_pem_path(key):
-    return os.path.expanduser('~/.ssh/%s.pem' % key)
+    return os.path.expanduser('~/.ssh/id_rsa')
 
 def _get_region(zone):
     return zone if 'gov' in zone else zone[:-1] # chop off the "d" in the "us-east-1d" to get the "Region"
@@ -521,8 +521,10 @@ def _attack(params):
 
         return response
     except socket.error as e:
+        print("Bee {} got swatted: {}".format(params['i'], e))
         return e
     except Exception as e:
+        print("Bee {} died due to technical fault".format(params['i']))
         traceback.print_exc()
         print()
         raise e
@@ -763,7 +765,7 @@ def attack(url, n, c, **options):
         params.append({
             'i': i,
             'instance_id': instance.id,
-            'instance_name': instance.private_dns_name if instance.public_dns_name == "" else instance.public_dns_name,
+            'instance_name': instance.ip_address,
             'url': urls[i % url_count],
             'concurrent_requests': connections_per_instance,
             'num_requests': requests_per_instance,
